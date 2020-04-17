@@ -30,11 +30,28 @@ access_token=$(curl -sX POST \
   "https://api.github.com/app/installations/$installation_id/access_tokens" \
   | jq -r .token)
 
-curl -sX POST \
+IFS=';' read -ra arr <<< "$GITHUB_REPO"
+GITHUB_ORG="${arr[0]}"
+
+pr_number=$(curl -s \
+  -H "$user_agent" \
+  -H "Authorization: token $access_token" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  "https://api.github.com/repos/$GITHUB_REPO/pulls?state=all&head=$GITHUB_ORG:$GITHUB_BRANCH" \
+  | jq -r .[0].number)
+
+if [[ "$installation_id" = "null" ]]; then
+  echo "Cannot find a PR for branch $GITHUB_BRANCH!" >&2
+  echo "Maybe the PR has not been created yet?" >&2
+  exit 0
+fi
+
+curl -s \
   -H "$user_agent" \
   -H "Authorization: token $access_token" \
   -H "Accept: application/vnd.github.machine-man-preview+json" \
   -H "Content-Type: application/json" \
   --data "$(jq -n --arg body "$1" '{"body":$body}')" \
-  "https://api.github.com/repos/$GITHUB_REPO/issues/$GITHUB_PR/comments" \
+  "https://api.github.com/repos/$GITHUB_REPO/issues/$pr_number/comments" \
   > /dev/null

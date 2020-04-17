@@ -99,8 +99,8 @@ $ docker run \
     -e "BRANCH_PREVIEW_ID=feat-1" \
     -e "GITHUB_APP_ID=00000" \
     -e "GITHUB_APP_PRIVATE_KEY_BASE64=$(cat private-key.pem | base64 -w 0)" \
+    -e "GITHUB_BRANCH=feat-1/add-new-feature" \
     -e "GITHUB_REPO=my-org/my-repo\
-    -e "GITHUB_PR=1" \
     -e "TFSTATE_RESOURCES_NAME=tfstate.example.com" \
     -ti z1digitalstudio/branch-preview-kit spa up
 ```
@@ -117,8 +117,8 @@ consult them [here](#bootstrap-variable-reference). In addition, it requires:
 | `BRANCH_PREVIEW_FQDN` | The Fully Qualified Domain Name of the branch preview subdomain. Branch previews will in turn be served under a subdomain of this subdomain. (i.e: `feat-1.branch-preview.example.com`) |
 | `GITHUB_APP_ID` | The ID of the GitHub App that will be used to report the preview URL on the GitHub pull request. |
 | `GITHUB_APP_PRIVATE_KEY_BASE64` | The private key of the GitHub App, as a base64 encoded string. |
+| `GITHUB_BRANCH` | The head branch of the GitHub Pull Request. This is where the GitHub App will post its comments. If the PR doesn't exist, it will not post anything. |
 | `GITHUB_REPO` | The GitHub repo of the project being built. |
-| `GITHUB_PR` | The number of the feature GitHub Pull Request. This is where the GitHub App will post its comments. |
 
 ### `spa up` outputs
 

@@ -26,13 +26,13 @@ if [[ -z "$GITHUB_APP_PRIVATE_KEY_BASE64" ]]; then
   exit 1
 fi
 
-if [[ -z "$GITHUB_REPO" ]]; then
-  echo "The GITHUB_REPO variable is missing!" >&2
+if [[ -z "$GITHUB_BRANCH" ]]; then
+  echo "The GITHUB_BRANCH variable is missing!" >&2
   exit 1
 fi
 
-if [[ -z "$GITHUB_PR" ]]; then
-  echo "The GITHUB_PR variable is missing!" >&2
+if [[ -z "$GITHUB_REPO" ]]; then
+  echo "The GITHUB_REPO variable is missing!" >&2
   exit 1
 fi
 
