@@ -11,6 +11,13 @@ jwt=$(jwt encode \
   --iss "$GITHUB_APP_ID" \
   --secret @private_key.pem)
 
+app_slug=$(curl -s \
+  -H "$user_agent" \
+  -H "Authorization: Bearer $jwt" \
+  -H "Accept: application/vnd.github.machine-man-preview+json" \
+  "https://api.github.com/app" \
+  | jq -r .slug)
+
 installation_id=$(curl -s \
   -H "$user_agent" \
   -H "Authorization: Bearer $jwt" \
@@ -41,17 +48,40 @@ pr_number=$(curl -s \
   "https://api.github.com/repos/$GITHUB_REPO/pulls?state=all&head=$GITHUB_ORG:$GITHUB_BRANCH" \
   | jq -r .[0].number)
 
-if [[ "$installation_id" = "null" ]]; then
+if [[ "$pr_number" = "null" ]]; then
   echo "Cannot find a PR for branch $GITHUB_BRANCH!" >&2
   echo "Maybe the PR has not been created yet?" >&2
-  exit 0
+  return 0
 fi
 
-curl -s \
+comment_id=$(curl -s \
   -H "$user_agent" \
   -H "Authorization: token $access_token" \
-  -H "Accept: application/vnd.github.machine-man-preview+json" \
+  -H "Accept: application/json" \
   -H "Content-Type: application/json" \
-  --data "$(jq -n --arg body "$1" '{"body":$body}')" \
-  "https://api.github.com/repos/$GITHUB_REPO/issues/$pr_number/comments" \
-  > /dev/null
+  "https://api.github.com/repos/$GITHUB_REPO/issues/$pr_number/comments" | \
+  jq -r "[.[] | select(.user.type == \"Bot\") | select(.user.login | contains(\"$app_slug\"))][0].id")
+
+if [[ "$comment_id" != "null" ]]; then
+  # We already posted a comment, update it
+  curl -s \
+    -X PATCH \
+    -H "$user_agent" \
+    -H "Authorization: token $access_token" \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    --data "$(jq -n --arg body "$1" '{"body":$body}')" \
+    "https://api.github.com/repos/$GITHUB_REPO/issues/comments/$comment_id" \
+    > /dev/null
+else
+  # We haven't yet posted, create a comment
+  curl -s \
+    -H "$user_agent" \
+    -H "Authorization: token $access_token" \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    --data "$(jq -n --arg body "$1" '{"body":$body}')" \
+    "https://api.github.com/repos/$GITHUB_REPO/issues/$pr_number/comments" \
+    > /dev/null
+fi
+
