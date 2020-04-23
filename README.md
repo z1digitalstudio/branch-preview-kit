@@ -238,6 +238,7 @@ correct values.
                 "cloudfront:UpdateDistribution",
                 "s3:DeleteBucket",
                 "s3:DeleteObject",
+                "s3:DeleteObjectVersion",
                 "s3:ListBucketVersions",
                 "s3:PutObject"
             ],
