@@ -15,7 +15,7 @@ resource "random_id" "bucket" {
     branch_preview_fqdn = var.branch_preview_fqdn
   }
 
-  byte_length = 2
+  byte_length = 16
 }
 
 resource "random_password" "secret" {
@@ -29,6 +29,6 @@ resource "random_password" "secret" {
 
 locals {
   branch_endpoint = "${terraform.workspace}.${var.branch_preview_fqdn}"
-  bucket_name     = "${local.branch_endpoint}.${random_id.bucket.hex}"
+  bucket_name     = "branch-preview.${random_id.bucket.hex}"
   user_agent      = base64sha512("${local.branch_endpoint}_${random_password.secret.result}")
 }
