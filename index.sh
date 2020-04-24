@@ -36,8 +36,8 @@ export TF_VAR_branch_preview_fqdn="$BRANCH_PREVIEW_FQDN"
 export TF_VAR_domain="$BASE_DOMAIN"
 
 # Connect to the provided Terraform state backend
-sed -ie "s/%%%tfstate_resources_name%%%/$TFSTATE_RESOURCES_NAME/g" bootstrap/main.tf
-sed -ie "s/%%%tfstate_resources_name%%%/$TFSTATE_RESOURCES_NAME/g" spa/main.tf
+sed -i -e "s/%%%tfstate_resources_name%%%/$TFSTATE_RESOURCES_NAME/g" bootstrap/main.tf
+sed -i -e "s/%%%tfstate_resources_name%%%/$TFSTATE_RESOURCES_NAME/g" spa/main.tf
 
 cd "$1" || exit
 "./$2.sh" "$@"
