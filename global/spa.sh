@@ -11,6 +11,13 @@ if [[ -z "$AWS_CERT_ARN" ]]; then
   exit 1
 fi
 
+REGEX="^[a-zA-Z0-9-]+$"
+
+if ! echo "$BRANCH_PREVIEW_ID" | grep -P -q "$REGEX"; then
+  echo "The BRANCH_PREVIEW_ID variable doesn't match the regex '$REGEX'!" >&2
+  exit 1
+fi
+
 if [[ -z "$BRANCH_PREVIEW_ID" ]]; then
   echo "The BRANCH_PREVIEW_ID variable is missing!" >&2
   exit 1
