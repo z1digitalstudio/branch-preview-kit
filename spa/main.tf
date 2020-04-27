@@ -3,6 +3,10 @@ provider "aws" {
   version = "~> 2.54"
 }
 
+provider "random" {
+  version = "~> 2.2"
+}
+
 terraform {
   backend "s3" {
     bucket = "%%%tfstate_resources_name%%%"
